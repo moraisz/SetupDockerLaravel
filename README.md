@@ -1,79 +1,62 @@
+# Setup Docker Para Projetos Laravel
 
-# Setup Docker Para Projetos Laravel (8, 9, 10 ou 11)
-[Assine a Academy, e Seja VIP!](https://academy.especializati.com.br)
+## Passo a passo
 
-### Passo a passo
-Clone Repositório
-```sh
-git clone https://github.com/especializati/setup-docker-laravel.git
-```
+- Clone Repositório
 
-Clone os Arquivos do Laravel
-```sh
-git clone https://github.com/laravel/laravel.git app-laravel
-```
+    ```sh
+    git clone https://github.com/moraisz/setup-docker-laravel.git
+    ```
 
+- Clone os Arquivos do Laravel
 
-Copie os arquivos docker-compose.yml, Dockerfile e o diretório docker/ para o seu projeto
-```sh
-cp -rf setup-docker-laravel/* app-laravel/
-```
-```sh
-cd app-laravel/
-```
+    ```sh
+    git clone https://github.com/laravel/laravel.git laravel-project
+    ```
 
+- Copie os arquivos base para o seu projeto Laravel
 
-Crie o Arquivo .env
-```sh
-cp .env.example .env
-```
+    ```sh
+    cp -rf BaseSetupLaravel/* laravel-project/
+    cd laravel-project/
+    ```
 
+- Crie o arquivo .env e edite
 
-Atualize as variáveis de ambiente do arquivo .env
-```dosini
-APP_NAME="Especializa Ti"
-APP_URL=http://localhost:8989
+    ```sh
+    cp .env.example .env
+    ```
 
-DB_CONNECTION=mysql
-DB_HOST=db
-DB_PORT=3306
-DB_DATABASE=laravel
-DB_USERNAME=root
-DB_PASSWORD=root
+- Suba os containers do projeto
 
-CACHE_DRIVER=redis
-QUEUE_CONNECTION=redis
-SESSION_DRIVER=redis
+    ```sh
+    docker-compose up -d
+    ```
 
-REDIS_HOST=redis
-REDIS_PASSWORD=null
-REDIS_PORT=6379
-```
+- Acessar o container
 
+    ```sh
+    docker-compose exec app bash
+    ```
 
-Suba os containers do projeto
-```sh
-docker-compose up -d
-```
+- Instalar as dependências do projeto
 
+    ```sh
+    composer install
+    ```
 
-Acessar o container
-```sh
-docker-compose exec app bash
-```
+- Gerar a key do projeto Laravel (vai automaticamente para o arquivo .env)
 
+    ```sh
+    php artisan key:generate
+    ```
 
-Instalar as dependências do projeto
-```sh
-composer install
-```
+- Acessar o projeto
 
+    [http://localhost:8000](http://localhost:8000)
 
-Gerar a key do projeto Laravel
-```sh
-php artisan key:generate
-```
+## Considerações
 
+### Agradecimentos ao [especializati](https://www.youtube.com/@especializati)
 
-Acessar o projeto
-[http://localhost:8989](http://localhost:8989)
+Esse repositório é inspirado no [setup-docker-laravel](https://github.com/especializati/setup-docker-laravel), entretanto fiz algumas mudanças a meu gosto.

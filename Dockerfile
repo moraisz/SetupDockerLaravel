@@ -1,6 +1,5 @@
 FROM php:8.3-fpm
 
-# set your user name, ex: user=carlos
 ARG user=yourusername
 ARG uid=1000
 
@@ -30,8 +29,8 @@ RUN mkdir -p /home/$user/.composer && \
 
 # Install redis
 RUN pecl install -o -f redis \
-    &&  rm -rf /tmp/pear \
-    &&  docker-php-ext-enable redis
+    && rm -rf /tmp/pear \
+    && docker-php-ext-enable redis
 
 # Set working directory
 WORKDIR /var/www
