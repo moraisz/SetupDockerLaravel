@@ -5,7 +5,7 @@
 - Clone Repositório
 
     ```sh
-    git clone https://github.com/moraisz/setup-docker-laravel.git
+    git clone https://github.com/moraisz/SetupDockerLaravel
     ```
 
 - Clone os Arquivos do Laravel
@@ -17,7 +17,7 @@
 - Copie os arquivos base para o seu projeto Laravel
 
     ```sh
-    cp -rf BaseSetupLaravel/* laravel-project/
+    cp -rf SetupDockerLaravel/* laravel-project/
     cd laravel-project/
     ```
 
