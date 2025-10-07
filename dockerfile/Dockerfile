@@ -10,7 +10,9 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     zip \
-    unzip
+    unzip \
+    nginx \
+    supervisor
 
 # Install nodejs
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
@@ -33,22 +35,21 @@ RUN docker-php-ext-install \
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Create system user to run Composer and Artisan Commands
-RUN useradd -G www-data,root -u $uid -d /home/$user $user
+RUN useradd -m -G www-data,root -u $uid -d /home/$user $user
 RUN mkdir -p /home/$user/.composer && \
     chown -R $user:$user /home/$user
-
-# Install redis
-RUN pecl install -o -f redis \
-    && rm -rf /tmp/pear \
-    && docker-php-ext-enable redis
 
 # Set working directory
 WORKDIR /var/www
 
-# Copy custom configurations PHP
-COPY docker/php/custom.ini /usr/local/etc/php/conf.d/custom.ini
+COPY . /var/www
 
-# Copy shell file
+# Copy custom configurations PHP and Nginx
+COPY docker/php/custom.ini /usr/local/etc/php/conf.d/custom.ini
+COPY docker/nginx/nginx.conf /etc/nginx/nginx.conf
+
+# Copy shell file and supervisord
+COPY ./docker/supervisord.conf /etc/supervisor/supervisord.conf
 COPY ./docker/start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh
 

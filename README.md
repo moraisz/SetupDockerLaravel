@@ -1,6 +1,6 @@
 # Setup Docker Para Projetos Laravel
 
-Setup inicial para projetos Laravel utilizando Docker.
+Setup inicial para projetos Laravel utilizando Docker, facilitando desenvolvimento e deploy.
 
 Há possibilidade de escolher entre dois setups, veja as vantagens de cada um:
 
@@ -14,8 +14,9 @@ Há possibilidade de escolher entre dois setups, veja as vantagens de cada um:
 
 - Um único container para o projeto, facilitando o deploy em serviços como o Fly, Render, Google Cloud Run.
 - Suficiente para projetos pequenos ou médios, principalmente sem banco de dados.
+- Mais simples de configurar e manter, pois está tudo no mesmo container.
 
-## Passo a passo Dockerfile + Docker Compose
+## Passo a passo
 
 - Clone Repositório
 
@@ -32,7 +33,7 @@ Há possibilidade de escolher entre dois setups, veja as vantagens de cada um:
 - Copie os arquivos base para o seu projeto Laravel escolhendo o setup
 
     ```sh
-    cp -rf SetupDockerLaravel/docker_compose/ laravel-project/
+    cp -rf SetupDockerLaravel/pasta_docker/* laravel-project/
     cd laravel-project/
     ```
 
@@ -47,6 +48,8 @@ Há possibilidade de escolher entre dois setups, veja as vantagens de cada um:
     ```sh
     docker-compose up -d
     ```
+
+    - OBS: Caso utilize o setup com Dockerfile, o docker-compose é para facilitar o desenvolvimento local.
 
 - Acessar o container
 
@@ -66,11 +69,13 @@ Há possibilidade de escolher entre dois setups, veja as vantagens de cada um:
     php artisan key:generate
     ```
 
+- Gerar o migration do banco de dados
+
+    ```sh
+    php artisan migrate
+    ```
+
 - Acessar o projeto
 
-    [http://localhost:8000](http://localhost:8000)
-
-## Passo a passo Dockerfile
-
-### Development
+    [http://localhost:8080](http://localhost:8080)
 

@@ -6,22 +6,13 @@ services:
             dockerfile: Dockerfile
         restart: unless-stopped
         working_dir: /var/www/
+        ports:
+            - "8080:80"
         volumes:
             - ./:/var/www
         depends_on:
             - db
             - redis
-        networks:
-            - laravel
-
-    nginx:
-        image: nginx:alpine
-        restart: unless-stopped
-        ports:
-            - "8080:80"
-        volumes:
-            - ./:/var/www
-            - ./docker/nginx/:/etc/nginx/conf.d/
         networks:
             - laravel
 
