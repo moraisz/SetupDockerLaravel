@@ -1,6 +1,6 @@
 FROM php:8.3-fpm
 
-ARG user=yourusername
+ARG user=your_system_user
 ARG uid=1000
 
 # Install system dependencies
@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
+    libpq-dev \
     zip \
     unzip \
     nginx \
@@ -39,9 +40,17 @@ RUN useradd -m -G www-data,root -u $uid -d /home/$user $user
 RUN mkdir -p /home/$user/.composer && \
     chown -R $user:$user /home/$user
 
+# Adjust permissions for nginx
+RUN mkdir -p /run/nginx \
+    && chmod 777 /run
+RUN mkdir -p /var/lib/nginx \
+    && chown -R www-data:www-data /var/lib/nginx \
+    && chown -R www-data:www-data /var/log/nginx \
+    && chmod -R 775 /var/lib/nginx \
+    && chmod -R 775 /var/log/nginx
+
 # Set working directory
 WORKDIR /var/www
-
 COPY . /var/www
 
 # Copy custom configurations PHP and Nginx
@@ -50,10 +59,8 @@ COPY docker/nginx/nginx.conf /etc/nginx/nginx.conf
 
 # Copy shell file and supervisord
 COPY ./docker/supervisord.conf /etc/supervisor/supervisord.conf
-COPY ./docker/start.sh /usr/local/bin/start.sh
-RUN chmod +x /usr/local/bin/start.sh
 
-# USER $user
+USER $user
 
 # Run shell file
-ENTRYPOINT ["/usr/local/bin/start.sh"]
+ENTRYPOINT ["/var/www/docker/start.sh"]

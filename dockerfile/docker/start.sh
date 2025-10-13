@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Running composer install..."
-composer install --no-dev --optimize-autoloader
+composer install
 
 echo "Running NPM install..."
 npm install
