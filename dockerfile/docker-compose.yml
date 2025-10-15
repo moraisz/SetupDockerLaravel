@@ -4,9 +4,16 @@ services:
         build:
             context: .
             dockerfile: Dockerfile
+            args:
+                UID: ${UID}
+                GID: ${GID}
+                USER: appuser
         restart: unless-stopped
+        env_file:
+            - .env
         ports:
             - "8080:80"
+            - "5173:5173"
         volumes:
             - ./:/var/www
         depends_on:
@@ -19,9 +26,9 @@ services:
         image: postgres:17.6
         restart: unless-stopped
         environment:
-            POSTGRES_DB: "${DB_DATABASE}"
-            POSTGRES_USER: "${DB_USERNAME}"
-            POSTGRES_PASSWORD: "${DB_PASSWORD}"
+            POSTGRES_DB: ${DB_DATABASE}
+            POSTGRES_USER: ${DB_USERNAME}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
             POSTGRES_INITDB_ARGS: "--encoding=UTF8 --lc-collate=C --lc-ctype=C"
         volumes:
             - db:/var/lib/postgresql/data

@@ -27,14 +27,14 @@ Há possibilidade de escolher entre dois setups, veja as vantagens de cada um:
 - Clone os Arquivos do Laravel
 
     ```sh
-    git clone https://github.com/laravel/laravel.git laravel-project
+    git clone https://github.com/laravel/laravel.git laravel_project
     ```
 
 - Copie os arquivos base para o seu projeto Laravel escolhendo o setup
 
     ```sh
-    cp -rf SetupDockerLaravel/pasta_docker/* laravel-project/
-    cd laravel-project/
+    cp -rf SetupDockerLaravel/pasta_docker/. laravel_project/
+    cd laravel_project/
     ```
 
 - Crie o arquivo .env e edite
@@ -46,33 +46,26 @@ Há possibilidade de escolher entre dois setups, veja as vantagens de cada um:
 - Suba os containers do projeto
 
     ```sh
-    docker-compose up -d
+    docker compose up -d
     ```
 
     - OBS: Caso utilize o setup com Dockerfile, o docker-compose é para facilitar o desenvolvimento local.
 
-- Acessar o container
-
-    ```sh
-    docker-compose exec app bash
-    ```
-
-- Instalar as dependências do projeto
-
-    ```sh
-    composer install
-    ```
-
 - Gerar a key do projeto Laravel (vai automaticamente para o arquivo .env)
 
     ```sh
-    php artisan key:generate
+    docker compose exec app php artisan key:generate
+    ```
+- Reinicie o container app
+
+    ```sh
+    docker compose restart app
     ```
 
 - Gerar o migration do banco de dados
 
     ```sh
-    php artisan migrate
+    docker compose exec app php artisan migrate
     ```
 
 - Acessar o projeto

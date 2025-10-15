@@ -1,7 +1,8 @@
 FROM php:8.3-fpm
 
-ARG user=your_system_user
-ARG uid=1000
+ARG USER=appuser
+ARG UID=1000
+ARG GID=1000
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -19,9 +20,6 @@ RUN apt-get update && apt-get install -y \
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
     apt-get install -y nodejs
 
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-
 # Install PHP extensions
 RUN docker-php-ext-install \
     pdo_pgsql \
@@ -32,35 +30,37 @@ RUN docker-php-ext-install \
     gd \
     sockets
 
+# Clear cache
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Create system user to run Composer and Artisan Commands
-RUN useradd -m -G www-data,root -u $uid -d /home/$user $user
-RUN mkdir -p /home/$user/.composer && \
-    chown -R $user:$user /home/$user
+RUN groupadd -g ${GID} ${USER} && \
+    useradd -m -u ${UID} -g ${USER} -G www-data,root -d /home/${USER} ${USER} && \
+    mkdir -p /home/${USER}/.composer && \
+    chown -R ${USER}:${USER} /home/${USER} && \
+    chown -R ${USER}:www-data /var/www
 
 # Adjust permissions for nginx
-RUN mkdir -p /run/nginx \
-    && chmod 777 /run
-RUN mkdir -p /var/lib/nginx \
-    && chown -R www-data:www-data /var/lib/nginx \
-    && chown -R www-data:www-data /var/log/nginx \
-    && chmod -R 775 /var/lib/nginx \
-    && chmod -R 775 /var/log/nginx
+RUN mkdir -p /run/nginx /var/lib/nginx && \
+    chown -R ${USER}:www-data /var/lib/nginx /var/log/nginx /run/nginx && \
+    chmod -R 775 /var/lib/nginx /var/log/nginx
 
 # Set working directory
 WORKDIR /var/www
-COPY . /var/www
 
-# Copy custom configurations PHP and Nginx
+# Copy configuration files
 COPY docker/php/custom.ini /usr/local/etc/php/conf.d/custom.ini
 COPY docker/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY docker/supervisord.conf /etc/supervisor/supervisord.conf
 
-# Copy shell file and supervisord
-COPY ./docker/supervisord.conf /etc/supervisor/supervisord.conf
+COPY --chown=${USER}:www-data . .
 
-USER $user
+RUN chmod +x /var/www/docker/start.sh
+
+USER $USER
 
 # Run shell file
-ENTRYPOINT ["/var/www/docker/start.sh"]
+CMD ["/var/www/docker/start.sh"]
