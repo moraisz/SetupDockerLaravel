@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-echo "ENV: ${APP_ENV:-production}"
+echo "ENV: ${APP_ENV:-local}"
 
 if [ "$APP_ENV" = "local" ]; then
     echo "Running composer install..."
@@ -9,12 +9,14 @@ if [ "$APP_ENV" = "local" ]; then
 
     echo "Running NPM install..."
     npm install
+
+    echo "Running NPM dev in background..."
+    npm run dev &
 else
-    echo "Running composer install (no-dev, otimizado)..."
+    echo "Running composer install..."
     composer install --no-dev --optimize-autoloader --no-interaction --no-progress
 
-    echo "Building frontend (npm ci + build)..."
-    npm ci --omit=dev
+    echo "Building frontend..."
     npm run build
 fi
 

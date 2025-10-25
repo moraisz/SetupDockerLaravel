@@ -1,7 +1,8 @@
 FROM php:8.3-fpm
 
-ARG user=yourusername
-ARG uid=1000
+ARG USER=appuser
+ARG UID=1000
+ARG GID=1000
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -9,15 +10,13 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
+    libpq-dev \
     zip \
     unzip
 
 # Install nodejs
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
     apt-get install -y nodejs
-
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
 RUN docker-php-ext-install \
@@ -29,30 +28,23 @@ RUN docker-php-ext-install \
     gd \
     sockets
 
+# Clear cache
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Create system user to run Composer and Artisan Commands
-RUN useradd -G www-data,root -u $uid -d /home/$user $user
-RUN mkdir -p /home/$user/.composer && \
-    chown -R $user:$user /home/$user
-
-# Install redis
-RUN pecl install -o -f redis \
-    && rm -rf /tmp/pear \
-    && docker-php-ext-enable redis
+RUN groupadd -g ${GID} ${USER} && \
+    useradd -m -u ${UID} -g ${USER} -G www-data,root -d /home/${USER} ${USER} && \
+    mkdir -p /home/${USER}/.composer && \
+    chown -R ${USER}:${USER} /home/${USER} && \
+    chown -R ${USER}:www-data /var/www
 
 # Set working directory
 WORKDIR /var/www
 
-# Copy custom configurations PHP
-COPY docker/php/custom.ini /usr/local/etc/php/conf.d/custom.ini
-
-# Copy shell file
-COPY ./docker/start.sh /usr/local/bin/start.sh
-RUN chmod +x /usr/local/bin/start.sh
-
-# USER $user
+USER $USER
 
 # Run shell file
-ENTRYPOINT ["/usr/local/bin/start.sh"]
+CMD ["/var/www/docker/start.sh"]

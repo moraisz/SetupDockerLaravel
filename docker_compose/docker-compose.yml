@@ -1,60 +1,51 @@
 services:
-    app:
-        container_name: LaravelApp
-        build:
-            context: .
-            dockerfile: Dockerfile
-        restart: unless-stopped
-        working_dir: /var/www/
-        volumes:
-            - ./:/var/www
-        depends_on:
-            - db
-            - redis
-        networks:
-            - laravel
+  app:
+    container_name: LaravelApp
+    build:
+      context: .
+      dockerfile: Dockerfile
+      restart: unless-stopped
+    volumes:
+      - ./docker/php/php.ini:/usr/local/etc/php/php.ini
+      - ./:/var/www
+    depends_on:
+      - db
+    networks:
+      - laravel
 
-    nginx:
-        image: nginx:alpine
-        restart: unless-stopped
-        ports:
-            - "8080:80"
-        volumes:
-            - ./:/var/www
-            - ./docker/nginx/:/etc/nginx/conf.d/
-        networks:
-            - laravel
+  nginx:
+    container_name: LaravelNginx
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+      - "5173:5173"
+    volumes:
+      - ./docker/nginx/:/etc/nginx/
+      - ./:/var/www/
+    networks:
+      - laravel
 
-    db:
-        container_name: LaravelDB
-        image: postgres:17.6
-        restart: unless-stopped
-        environment:
-            POSTGRES_DB: "${DB_DATABASE}"
-            POSTGRES_USER: "${DB_USERNAME}"
-            POSTGRES_PASSWORD: "${DB_PASSWORD}"
-            POSTGRES_INITDB_ARGS: "--encoding=UTF8 --lc-collate=C --lc-ctype=C"
-        volumes:
-            - db:/var/lib/postgresql/data
-        ports:
-            - "5432:5432"
-        networks:
-            - laravel
-
-    redis:
-        container_name: LaravelRedis
-        image: redis:latest
-        volumes:
-            - redis:/data
-        networks:
-            - laravel
+  db:
+    container_name: LaravelDB
+    image: postgres:17.6
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --lc-collate=C --lc-ctype=C"
+    volumes:
+      - db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - laravel
 
 volumes:
-    db:
-        driver: local
-    redis:
-        driver: local
+  db:
+    driver: local
 
 networks:
-    laravel:
-        driver: bridge
+  laravel:
+    driver: bridge
